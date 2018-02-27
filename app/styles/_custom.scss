@@ -1,0 +1,206 @@
+.container-fluid {
+  max-width: 992px;
+}
+
+.ccm-wrapper {
+  margin-top: 40px;
+  @include box-shadow(0 0 1px 1px rgba($black-color, .1));
+
+  > .ccm-container {
+    padding: 8px;
+  }
+}
+
+.ccm-com-container {
+  width: 310px;
+
+  @include flexbox((
+    display: flex,
+    flex-direction: column
+  ));
+
+  @include border-radius(3px);
+
+  @include box-shadow(0 0 1px 1px rgba($black-color, .1));
+
+  .form-group {
+    margin-bottom: 12px;
+
+    label {
+      margin-bottom: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+  }
+
+  hr {
+    margin-top: 12px;
+    margin-bottom: 12px;
+  }
+
+  > .ccm-com-head {
+    padding: 8px;
+    @include border-top-radius(inherit);
+
+    > :last-child {
+      margin-bottom: 4px;
+    }
+  }
+
+  > .ccm-com-channels {
+    @include flexbox((
+      display: flex,
+      flex-direction: column
+    ));
+  }
+
+  > .ccm-com-buttons {
+    padding: 8px;
+
+    @include border-bottom-radius(inherit);
+    // font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    background-color: $nobel-color;
+    color: $white-color;
+    border-top: 1px solid $dusty-gray-color;
+  }
+}
+
+.ccm-channel {
+  @include flexbox((
+    display: flex,
+    flex-direction: column,
+    flex: 1
+  ));
+
+  background: $concrete-color;
+  @include box-shadow (inset 0 1px $silver-color);
+
+  .ccm-channel-header {
+    position: relative;
+    @include flexbox((
+      display: flex,
+      flex-direction: row,
+      align-items: center
+    ));
+    padding: 6px 36px;
+
+    > .ccm-channel-header-priority {
+      position: absolute;
+      @include flexbox((
+        display: inline-flex,
+        flex-direction: row,
+        justify-content: center,
+        align-items: center
+      ));
+      left: 0;
+      min-width: 36px;
+      min-height: 36px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    > .ccm-channel-header-title {
+      @include flexbox((
+        display: flex,
+        flex-direction: row,
+        align-items: center,
+        flex: 1
+      ));
+
+      min-height: 28px;
+      // font-size: 12px;
+      font-weight: 600;
+      border-right: 1px solid $silver-color;
+    }
+
+    > .ccm-channel-header-btn {
+      position: absolute;
+      right: 4px;
+      min-width: 28px;
+      min-height: 28px;
+      padding: 4px;
+      border: none;
+      background: transparent;
+      
+      @include transition(.3s cubic-bezier(0.95, 0.05, 0.795, 0.035));
+
+
+      touch-action: manipulation;
+      cursor: pointer;
+      @include user-select(none);
+
+      &.collapsed {
+        @include transform(rotateX(180deg));
+      }
+    }
+  }
+
+  .ccm-channel-collapse {
+    padding: 0 0 4px;
+
+    .ccm-channel-collapse-item {
+      position: relative;
+      min-height: 36px;
+      padding: 2px 36px;
+
+      .btn {
+        line-height: 1.14286;
+        padding: 8px;
+        width: 100%;
+        border-radius: 3px;
+      }
+    }
+  }
+}
+
+$color_checkbox_success:#4cd964;
+$color_checkbox_default:#8E8E93;
+$transition: .3s cubic-bezier(0.95, 0.05, 0.795, 0.035);
+$height: 1.4286em;
+$width: $height*2;
+
+.toggle {
+  display: block;
+  margin: 0;
+  padding: 0;
+  font-size: inherit;
+
+  .toggle-control {
+    @include transition($transition);
+    width: calc(#{$width} + 4px);
+    height: calc(#{$height} + 4px);
+    display: block;
+    // border: 2px solid $color_checkbox_default;
+    @include border-radius($height);
+    background-color: rgba(black,.16);
+    position: relative;
+
+    &:after {
+      @include transition($transition);
+      content: "";
+      width: $height;
+      height: $height;
+      display: block;
+      background-color: #fff;
+      @include border-radius(50%);
+      // @include box-shadow(0 1px 2px rgba(black, .4),
+      //                     0 3px 2px rgba(black,.4));
+      position: absolute;
+      top: 2px;
+      left: 2px;
+    }
+  }
+  
+  .toggle-input {
+    display: none;
+    &:checked + .toggle-control{
+      border-color: $color_checkbox_success;
+      background-color: $color_checkbox_success;
+      &:after{
+        left: calc(#{$height} + 2px);
+      }
+    }
+  }
+}

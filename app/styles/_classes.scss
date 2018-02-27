@@ -1,0 +1,53 @@
+.h-100 {
+  @include fullh;
+}
+
+
+/* Column system */
+
+.row {
+  &.row-small {
+    margin-left: -4px;
+    margin-right: -4px;
+    
+    [class*=col-] {
+      padding-right: 4px;
+      padding-left: 4px;
+    }
+  }
+}
+
+
+/* Buttons */
+
+.btn {
+  // border: none;
+
+  &.btn-icon {
+    min-width: 28px;
+    min-height: 28px;
+    padding: 4px;
+  }
+}
+
+
+/* Buttons */
+
+.truncate {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+
+/* Forms */
+
+.form-line {
+  @include flexbox((
+    display: flex,
+    flex-direction: row,
+    justify-content: space-between,
+    align-items: center
+  ));
+  margin-bottom: 12px;
+}
