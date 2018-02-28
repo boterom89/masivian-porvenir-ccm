@@ -1,107 +1,110 @@
-var CopyWebpackPlugin = require('copy-webpack-plugin');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var package = require('./package.json');
-var path = require('path');
+const path = require('path');
+const glob = require("glob");
+const merge = require("webpack-merge");
+const parts = require("./webpack.parts");
+
+
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const PATHS = {
   app: path.join(__dirname, "app"),
   build: path.join(__dirname, "build"),
 };
 
-module.exports = {
-  entry: {
-    app: './app/scripts/main.js',
-    vendor: [
-      "script-loader!jquery",
-      "script-loader!bootstrap-sass",
-      "script-loader!bootstrap-table",
-      "script-loader!bootstrap-multiselect"
-    ]
+const commonConfig = merge([
+  {
+    entry: {
+      app: PATHS.app,
+      vendor: [
+        "script-loader!jquery",
+        "script-loader!bootstrap-sass",
+        "script-loader!bootstrap-table",
+        "script-loader!bootstrap-multiselect"
+      ]
+    },
+    output: {
+      path: PATHS.build,
+      filename: 'scripts/[name].js',
+      publicPath: "/"
+    },
+    plugins: [
+      new HtmlWebpackPlugin({
+        // hash: true,
+        template: './app/index.html',
+        chunks: ['vendor', 'app'],
+        path: path.join(__dirname, "build"),
+        filename: 'index.html' //relative to root of the application
+      })
+    ],
+    resolve: {
+      extensions: ['.ts', '.js']
+    }
+    // bail: true
+    // watch: true
   },
-  output: {
-    path: path.join(__dirname, "../dist/"),
-    filename: '[name].bundle.js',
-    publicPath: "/"
-  },
-  plugins: [
-    new ExtractTextPlugin({
-      filename: 'app.bundle.css'
-    }),
-    new HtmlWebpackPlugin({
-      hash: true,
-      template: './app/index.html',
-      chunks: ['vendor', 'app'],
-      path: path.join(__dirname, "../dist/"),
-      filename: 'index.html' //relative to root of the application
-    }),
-    new CopyWebpackPlugin([{
-      from: 'app/images',
-      to: 'images'
-    }])
-  ],
-  resolve: {
-    extensions: ['.ts', '.js']
-  },
-  devServer: {
-    contentBase: path.join(__dirname, "../dist/"),
-    port: 9090
-  },
-  // devtool: 'source-map',
-  devtool: 'inline-source-map',
-  module: {
-    rules: [
-      { 
-        test: /\.(s*)css$/,
-        exclude: /node_modules/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [{
-            loader: 'css-loader',
-            options: {
-              sourceMap: true
-            }
-          }, {
-            loader: 'resolve-url-loader',
-            options: {
-              sourceMap: true
-            }
-          }, {
-            loader: 'sass-loader',
-            options: {
-              sourceMap: true
-            }
-          }]
-        })
-      },
+  parts.extractCSS({
+    use: [
       {
-        // test: /\.(png|jp(e*)g|svg)$/,
-        // test: /.(ttf|otf|eot|svg|woff(2)?)(\?[a-z0-9]+)?$/,
-        // use: [{
-        //   loader: 'file-loader',
-        //   options: {
-        //     name: 'fonts/[name].[ext]',
-        //     outputPath: 'fonts/',    // where the fonts will go
-        //     publicPath: '../'       // override the default path
-        //   }
-        // }]
-        // Match woff2 in addition to patterns like .woff?v=1.1.1.
-        // test: /\.(eot|ttf|woff|woff2)(\?v=\d+\.\d+\.\d+)?$/,
-        // use: [{
-        //   loader: "file-loader",
-        //   options: {
-        //     // Limit at 50k. Above that it emits separate files
-        //     limit: 50000,
+        loader: 'css-loader',
+        options: {
+          sourceMap: true
+        }
+      },
+      parts.autoprefix(),
+      {
+        loader: 'resolve-url-loader',
+        options: {
+          sourceMap: true
+        }
+      }, {
+        loader: 'sass-loader',
+        options: {
+          precision: 8,
+          sourceMap: true
+        }
+      }
+    ]
+  }),
+  parts.loadImages({
+    exclude: [/fonts/],
+    options: {
+      name: "./images/[name].[ext]"
+    }
+  }),
+  parts.loadFonts({
+    exclude: [/images/],
+    options: {
+      name: "./fonts/[name].[ext]"
+    }
+  })
+]);
 
-        //     // url-loader sets mimetype if it's passed.
-        //     // Without this it derives it from the file extension
-        //     mimetype: "application/font-woff",
+const productionConfig = merge([
+  parts.purifyCSS({
+    paths: glob.sync(`${PATHS.app}/**/*.html`, { nodir: true }),
+    minimize: true
+  }),
+  parts.generateSourceMaps({
+    type: 'source-map'
+  }),
+]);
 
-        //     // Output below fonts directory
-        //     name: "./fonts/[name].[ext]"
-        //   }
-        // }]
-      }]
-  },
-  // watch: true
+const developmentConfig = merge([
+  parts.devServer({
+    // Customize host/port here if needed
+    host: process.env.HOST,
+    port: process.env.PORT,
+  }),
+  parts.generateSourceMaps({
+    type: 'inline-source-map'
+  }),
+]);
+
+module.exports = env => {
+  if (env === "production") {
+    return merge(commonConfig, productionConfig);
+  }
+
+  return merge(commonConfig, developmentConfig);
 };
