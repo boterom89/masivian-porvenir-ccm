@@ -3,8 +3,6 @@ const glob = require("glob");
 const merge = require("webpack-merge");
 const parts = require("./webpack.parts");
 
-
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const PATHS = {
@@ -40,8 +38,6 @@ const commonConfig = merge([
     resolve: {
       extensions: ['.ts', '.js']
     }
-    // bail: true
-    // watch: true
   },
   parts.extractCSS({
     use: [
@@ -57,7 +53,8 @@ const commonConfig = merge([
         options: {
           sourceMap: true
         }
-      }, {
+      },
+      {
         loader: 'sass-loader',
         options: {
           precision: 8,
@@ -87,7 +84,7 @@ const productionConfig = merge([
   }),
   parts.generateSourceMaps({
     type: 'source-map'
-  }),
+  })
 ]);
 
 const developmentConfig = merge([
@@ -98,7 +95,7 @@ const developmentConfig = merge([
   }),
   parts.generateSourceMaps({
     type: 'inline-source-map'
-  }),
+  })
 ]);
 
 module.exports = env => {

@@ -13,7 +13,6 @@ exports.devServer = ({ host, port } = {}) => ({
   }
 });
 
-
 exports.generateSourceMaps = ({ type }) => ({
   devtool: type
 });
@@ -56,7 +55,8 @@ exports.purifyCSS = ({ paths, minimize }) => ({
     new PurifyCSSPlugin({
       paths,
       minimize
-    })]
+    })
+  ]
 });
 
 exports.loadImages = ({ include, exclude, options } = {}) => ({
